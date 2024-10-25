@@ -11,8 +11,15 @@ namespace CollegeApp.Controllers
     {
         [HttpGet]
         [Route("All", Name = "GetAllStudents")]
-        public ActionResult<IEnumerable<Student>> GetStudents()
+        public ActionResult<IEnumerable<StudentDTO>> GetStudents()
         {
+            var students = CollegeRepository.Students.Select(s => new StudentDTO()
+            {
+                Id = s.Id,
+                StudentName = s.StudentName,
+                Address = s.Address,
+                Email = s.Email,
+            });
             //Ok - 200 - success
             return Ok(CollegeRepository.Students);
         }
@@ -22,7 +29,7 @@ namespace CollegeApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Student> GetStudentById(int id)
+        public ActionResult<StudentDTO> GetStudentById(int id)
         {
             //BadRequest - 400 - BadRequest - Client error
             if (id <= 0)
@@ -35,15 +42,22 @@ namespace CollegeApp.Controllers
             {
                 return NotFound($"The student with id {id} not found");
             }
+            var studentDTO = new StudentDTO
+            {
+                Id = student.Id,
+                StudentName = student.StudentName,
+                Email = student.Email,
+                Address = student.Address,
+            };
             //Ok - 200 - success
-            return Ok(student);
+            return Ok(studentDTO);
         }
 
         [HttpGet("{name:alpha}", Name = "GetStudentByName")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Student> GetStudentByName(string name)
+        public ActionResult<StudentDTO> GetStudentByName(string name)
         {
             //BadRequest - 400 - BadRequest - Client error
             if (string.IsNullOrEmpty(name))
@@ -56,8 +70,42 @@ namespace CollegeApp.Controllers
             {
                 return NotFound($"The student with name {name} not found");
             }
+            var studentDTO = new StudentDTO
+            {
+                Id = student.Id,
+                StudentName = student.StudentName,
+                Email = student.Email,
+                Address = student.Address,
+            };
             //Ok - 200 - success
-            return Ok(student);
+            return Ok(studentDTO);
+        }
+
+        [HttpPost]
+        [Route("Create")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<StudentDTO> CreateStudent([FromBody] StudentDTO model)
+        {
+            if (model == null)
+            {
+                return BadRequest();
+            }
+            int newId = CollegeRepository.Students.LastOrDefault().Id + 1;
+            Student student = new Student()
+            {
+                Id = newId,
+                StudentName = model.StudentName,
+                Address = model.Address,
+                Email = model.Email,
+            };
+            CollegeRepository.Students.Add(student);
+            model.Id = student.Id;
+            //Status - 201
+            ///api/Student/3
+            //New student details
+            return CreatedAtRoute("GetStudentById", new { id = model.Id }, model);
         }
 
         [HttpDelete("{id}", Name = "DeleteStudentById")]
