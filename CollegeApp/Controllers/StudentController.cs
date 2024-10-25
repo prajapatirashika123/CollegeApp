@@ -12,9 +12,9 @@ namespace CollegeApp.Controllers
     {
         private readonly IMyLogger _myLogger;
 
-        public StudentController()
+        public StudentController(IMyLogger myLogger)
         {
-            _myLogger = new LogToServerMemory();
+            _myLogger = myLogger;
         }
 
         [HttpGet]

@@ -8,13 +8,14 @@ namespace CollegeApp.Controllers
     [ApiController]
     public class DemoController : ControllerBase
     {
-        //1. Strongly coupled/tightly coupled
+        //2. Loosely coupled
         private readonly IMyLogger _myLogger;
 
-        public DemoController()
+        public DemoController(IMyLogger myLogger)
         {
-            _myLogger = new LogToFile();
+            _myLogger = myLogger;
         }
+
         [HttpGet]
         public ActionResult Index()
         {
