@@ -1,4 +1,5 @@
 ﻿using CollegeApp.Models;
+using CollegeApp.MyLogging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Xml.Linq;
@@ -9,10 +10,18 @@ namespace CollegeApp.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
+        private readonly IMyLogger _myLogger;
+
+        public StudentController()
+        {
+            _myLogger = new LogToServerMemory();
+        }
+
         [HttpGet]
         [Route("All", Name = "GetAllStudents")]
         public ActionResult<IEnumerable<StudentDTO>> GetStudents()
         {
+            _myLogger.Log("GetAllStudents method.");
             var students = CollegeRepository.Students.Select(s => new StudentDTO()
             {
                 Id = s.Id,
