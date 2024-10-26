@@ -10,18 +10,14 @@ namespace CollegeApp.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-        private readonly IMyLogger _myLogger;
-
-        public StudentController(IMyLogger myLogger)
+        public StudentController()
         {
-            _myLogger = myLogger;
         }
 
         [HttpGet]
         [Route("All", Name = "GetAllStudents")]
         public ActionResult<IEnumerable<StudentDTO>> GetStudents()
         {
-            _myLogger.Log("GetAllStudents method.");
             var students = CollegeRepository.Students.Select(s => new StudentDTO()
             {
                 Id = s.Id,
@@ -117,11 +113,35 @@ namespace CollegeApp.Controllers
             return CreatedAtRoute("GetStudentById", new { id = model.Id }, model);
         }
 
+        [HttpPut]
+        [Route("Update")]
+        //api/student/update
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult UpdateStudent([FromBody] StudentDTO model)
+        {
+            if (model == null || model.Id == 0)
+            {
+                BadRequest();
+            }
+            var existingStudent = CollegeRepository.Students.Where(x => x.Id == model.Id).FirstOrDefault();
+            if (existingStudent == null)
+            {
+                return NotFound();
+            }
+            existingStudent.Address = model.Address;
+            existingStudent.Email = model.Email;
+            existingStudent.StudentName = model.StudentName;
+            return NoContent();
+        }
+
         [HttpDelete("{id}", Name = "DeleteStudentById")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public ActionResult<bool> DeleteStudentBId(int id)
+        public ActionResult<bool> DeleteStudentById(int id)
         {
             //BadRequest - 400 - BadRequest - Client error
             if (id <= 0)

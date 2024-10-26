@@ -11,4 +11,3 @@ namespace CollegeApp.Data
         private DbSet<Student> Students { get; set; }
     }
 }
-}
