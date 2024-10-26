@@ -3,22 +3,27 @@ using CollegeApp.MyLogging;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
+var builder = WebApplication.CreateBuilder(args);
+
+#region Serilog settings
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.File("Log/log.txt", rollingInterval: RollingInterval.Minute)
     .CreateLogger();
-
-var builder = WebApplication.CreateBuilder(args);
-
 //Only use serilog
-//builder.Services.AddSerilog();
+builder.Services.AddSerilog();
 //Use serilog along with built in loggers
-builder.Logging.AddSerilog();
+//builder.Logging.AddSerilog();
+
+#endregion Serilog settings
+
 // Add services to the container.
 builder.Services.AddDbContext<CollegeDBContext>(options =>
 {
-    options.UseSqlServer("Data Source=(local);Initial Catalog=CollegeAppDB;Integrated Security=True;Trust Server Certificate=True");
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CollegeAppDBConnection"));
 });
+
 builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
