@@ -12,11 +12,9 @@ namespace CollegeApp.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-        private readonly ILogger<StudentController> _logger;
 
-        public StudentController(ILogger<StudentController> logger)
+        public StudentController()
         {
-            _logger = logger;
         }
 
         [HttpGet]

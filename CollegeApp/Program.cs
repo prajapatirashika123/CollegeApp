@@ -1,14 +1,19 @@
 using CollegeApp.Data;
 using CollegeApp.MyLogging;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.File("Log/log.txt", rollingInterval: RollingInterval.Minute)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
-//Clear all logging providers
-builder.Logging.ClearProviders();
-//Provide logging providers
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
 
+//Only use serilog
+//builder.Services.AddSerilog();
+//Use serilog along with built in loggers
+builder.Logging.AddSerilog();
 // Add services to the container.
 builder.Services.AddDbContext<CollegeDBContext>(options =>
 {
@@ -19,7 +24,6 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IMyLogger, LogToFile>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

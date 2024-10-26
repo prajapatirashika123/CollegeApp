@@ -8,10 +8,9 @@ namespace CollegeApp.Controllers
     [ApiController]
     public class DemoController : ControllerBase
     {
-        //2. Loosely coupled
-        private readonly IMyLogger _myLogger;
+        private readonly ILogger<DemoController> _myLogger;
 
-        public DemoController(IMyLogger myLogger)
+        public DemoController(ILogger<DemoController> myLogger)
         {
             _myLogger = myLogger;
         }
@@ -19,7 +18,12 @@ namespace CollegeApp.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            _myLogger.Log("Index method started");
+            _myLogger.LogCritical("LogCritical");
+            _myLogger.LogDebug("LogDebug");
+            _myLogger.LogError("LogError");
+            _myLogger.LogInformation("LogInformation");
+            _myLogger.LogTrace("LogTrace");
+            _myLogger.LogWarning("LogWarning");
             return Ok();
         }
     }
