@@ -4,15 +4,15 @@ namespace CollegeApp.Models
 {
     public class StudentDTO
     {
-        public int Id { get; set; }
-
         [Required]
-        public string StudentName { get; set; }
+        public string Address { get; set; }
 
         [EmailAddress]
         public string Email { get; set; }
 
+        public int Id { get; set; }
+
         [Required]
-        public string Address { get; set; }
+        public string StudentName { get; set; }
     }
 }
