@@ -3,6 +3,11 @@ using CollegeApp.MyLogging;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+//Clear all logging providers
+builder.Logging.ClearProviders();
+//Provide logging providers
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 // Add services to the container.
 builder.Services.AddDbContext<CollegeDBContext>(options =>
