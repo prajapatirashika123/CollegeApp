@@ -104,7 +104,7 @@ namespace CollegeApp.Controllers
         {
             var students = await _dBContext.Students.ToListAsync();
             var studentDTOData = _mapper.Map<List<StudentDTO>>(students);
-            return Ok(students);
+            return Ok(studentDTOData);
         }
 
         [HttpPatch]
