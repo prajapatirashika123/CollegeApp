@@ -29,7 +29,14 @@ namespace CollegeApp.Data
                     Address="wnx.s8,we"
                 },
             });
-            // base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Student>(entity =>
+            {
+                entity.Property(n => n.StudentName).IsRequired();
+                entity.Property(n => n.StudentName).HasMaxLength(250);
+                entity.Property(n => n.Address).IsRequired(false).HasMaxLength(500);
+                entity.Property(n => n.Email).IsRequired().HasMaxLength(250);
+            });
         }
     }
 }
