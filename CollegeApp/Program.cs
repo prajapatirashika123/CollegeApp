@@ -9,7 +9,7 @@ builder.Services.AddDbContext<CollegeDBContext>(options =>
 {
     options.UseSqlServer("Data Source=(local);Initial Catalog=CollegeAppDB;Integrated Security=True;Trust Server Certificate=True");
 });
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
