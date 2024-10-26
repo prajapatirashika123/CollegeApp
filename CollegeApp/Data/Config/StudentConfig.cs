@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Reflection.Emit;
 
 namespace CollegeApp.Data.Config
 {
@@ -18,14 +17,14 @@ namespace CollegeApp.Data.Config
             builder.HasData(new List<Student>()
             {
                 new Student {
-                    Address="123,4,qasjh"
+                    Address="123,4,qasjh",
                     DOB = new DateTime(2022,12,3),
                     Email="aih@gmail.com",
                     Id =1,
                     StudentName="AVc",
                 },
                 new Student {
-                    Address="wnx.s8,we"
+                    Address="wnx.s8,we",
                     DOB = new DateTime(2022,8,23),
                     Email="iyt@gmail.com",
                     Id =2,

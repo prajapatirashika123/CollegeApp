@@ -5,11 +5,12 @@ namespace CollegeApp.Data
 {
     public class CollegeDBContext : DbContext
     {
-        public CollegeDBContext(DbContextOptions<CollegeDBContext> options) : base(options)
+        public CollegeDBContext(DbContextOptions<CollegeDBContext> options) 
+            : base(options)
         {
         }
 
-        private DbSet<Student> Students { get; set; }
+        public DbSet<Student> Students { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
