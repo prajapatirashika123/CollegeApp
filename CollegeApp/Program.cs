@@ -54,11 +54,11 @@ builder.Services.AddCors(options => {
     });
     options.AddPolicy("AllowOnlyGoogle", policy =>
     {
-        policy.WithOrigins("http://google.com,http://gmail.com").AllowAnyHeader().AllowAnyMethod();
+        policy.WithOrigins("http://google.com","http://gmail.com").AllowAnyHeader().AllowAnyMethod();
     });
     options.AddPolicy("AllowOnlyMicrosoft", policy =>
     {
-        policy.WithOrigins("http://outlook.com,http://microsoft.com").AllowAnyHeader().AllowAnyMethod();
+        policy.WithOrigins("http://outlook.com","http://microsoft.com").AllowAnyHeader().AllowAnyMethod();
     });
 });
 var app = builder.Build();
