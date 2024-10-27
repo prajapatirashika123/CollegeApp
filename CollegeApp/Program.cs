@@ -48,6 +48,10 @@ builder.Services.AddCors(options => {
     {
         policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
     options.AddPolicy("AllowOnlyLocalhost", policy =>
     {
         policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod();
@@ -61,6 +65,7 @@ builder.Services.AddCors(options => {
         policy.WithOrigins("http://outlook.com","http://microsoft.com").AllowAnyHeader().AllowAnyMethod();
     });
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -72,10 +77,23 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseCors();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("api/testingendpoint",
+        context => context.Response.WriteAsync("Test Response"))
+        .RequireCors("AllowOnlyLocalhost");
+
+    endpoints.MapControllers()
+             .RequireCors("AllowAll");
+
+    endpoints.MapGet("api/testingendpoint2",
+        context => context.Response.WriteAsync("echo2"));
+});
 
 app.Run();

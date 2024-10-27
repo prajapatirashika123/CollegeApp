@@ -10,7 +10,6 @@ namespace CollegeApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors()]
     public class StudentController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -43,7 +42,6 @@ namespace CollegeApp.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        [DisableCors]
         public async Task<ActionResult<bool>> DeleteStudentById(int id)
         {
             if (id <= 0)
@@ -100,7 +98,6 @@ namespace CollegeApp.Controllers
 
         [HttpGet]
         [Route("All", Name = "GetAllStudents")]
-        [EnableCors(PolicyName = "AllowOnlyMicrosoft")]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudents()
         {
             var students = await _studentRepository.GetAll();
