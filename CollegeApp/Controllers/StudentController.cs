@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using CollegeApp.Data;
+using CollegeApp.Data.Repository;
 using CollegeApp.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.ValueGeneration.Internal;
 
 namespace CollegeApp.Controllers
 {
@@ -12,13 +11,13 @@ namespace CollegeApp.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-        private readonly CollegeDBContext _dBContext;
         private readonly IMapper _mapper;
+        private readonly IStudentRepository _studentRepository;
 
-        public StudentController(CollegeDBContext dBContext, IMapper mapper)
+        public StudentController(IMapper mapper, IStudentRepository studentRepository)
         {
-            _dBContext = dBContext;
             _mapper = mapper;
+            _studentRepository = studentRepository;
         }
 
         [HttpPost]
@@ -33,9 +32,8 @@ namespace CollegeApp.Controllers
                 return BadRequest();
             }
             Student student = _mapper.Map<Student>(model);
-            await _dBContext.Students.AddAsync(student);
-            await _dBContext.SaveChangesAsync();
-            model.Id = student.Id;
+            var id = await _studentRepository.Create(student);
+            model.Id = id;
             return CreatedAtRoute("GetStudentById", new { id = model.Id }, model);
         }
 
@@ -49,13 +47,12 @@ namespace CollegeApp.Controllers
             {
                 return BadRequest();
             }
-            var student = await _dBContext.Students.Where(x => x.Id == id).FirstAsync();
+            var student = await _studentRepository.GetById(id);
             if (student == null)
             {
                 return NotFound($"The student with id {id} not found");
             }
-            _dBContext.Students.Remove(student);
-            _dBContext.SaveChangesAsync();
+            await _studentRepository.Delete(student);
             return Ok(true);
         }
 
@@ -70,7 +67,7 @@ namespace CollegeApp.Controllers
             {
                 return BadRequest();
             }
-            var student = await _dBContext.Students.Where(x => x.Id == id).FirstOrDefaultAsync();
+            var student = await _studentRepository.GetById(id);
             if (student == null)
             {
                 return NotFound($"The student with id {id} not found");
@@ -89,7 +86,7 @@ namespace CollegeApp.Controllers
             {
                 return BadRequest();
             }
-            var student = await _dBContext.Students.Where(x => x.StudentName == name).FirstOrDefaultAsync();
+            var student = await _studentRepository.GetByName(name);
             if (student == null)
             {
                 return NotFound($"The student with name {name} not found");
@@ -102,7 +99,7 @@ namespace CollegeApp.Controllers
         [Route("All", Name = "GetAllStudents")]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudents()
         {
-            var students = await _dBContext.Students.ToListAsync();
+            var students = await _studentRepository.GetAll();
             var studentDTOData = _mapper.Map<List<StudentDTO>>(students);
             return Ok(studentDTOData);
         }
@@ -120,7 +117,7 @@ namespace CollegeApp.Controllers
             {
                 BadRequest();
             }
-            var existingStudent = await _dBContext.Students.AsNoTracking().Where(x => x.Id == id).FirstOrDefaultAsync();
+            var existingStudent = await _studentRepository.GetById(id, true);
             if (existingStudent == null)
             {
                 return NotFound();
@@ -132,8 +129,7 @@ namespace CollegeApp.Controllers
                 return BadRequest(ModelState);
             }
             existingStudent = _mapper.Map<Student>(studentDTO);
-            _dBContext.Students.Update(existingStudent);
-            await _dBContext.SaveChangesAsync();
+            await _studentRepository.Update(existingStudent);
             return NoContent();
         }
 
@@ -150,14 +146,13 @@ namespace CollegeApp.Controllers
             {
                 BadRequest();
             }
-            var existingStudent = await _dBContext.Students.AsNoTracking().Where(x => x.Id == model.Id).FirstOrDefaultAsync();
+            var existingStudent = await _studentRepository.GetById(model.Id, true);
             if (existingStudent == null)
             {
                 return NotFound();
             }
             var newRecord = _mapper.Map<Student>(model);
-            _dBContext.Students.Update(newRecord);
-            await _dBContext.SaveChangesAsync();
+            await _studentRepository.Update(newRecord);
             return NoContent();
         }
     }

@@ -1,5 +1,6 @@
 using CollegeApp.Configurations;
 using CollegeApp.Data;
+using CollegeApp.Data.Repository;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -30,6 +31,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
+
+builder.Services.AddTransient<IStudentRepository, StudentRepository>();
 
 var app = builder.Build();
 
