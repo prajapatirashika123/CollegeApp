@@ -12,9 +12,9 @@ namespace CollegeApp.Controllers
     public class StudentController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IStudentRepository _studentRepository;
+        private readonly ICollegeRepository<Student> _studentRepository;
 
-        public StudentController(IMapper mapper, IStudentRepository studentRepository)
+        public StudentController(IMapper mapper, ICollegeRepository<Student> studentRepository)
         {
             _mapper = mapper;
             _studentRepository = studentRepository;
@@ -32,8 +32,8 @@ namespace CollegeApp.Controllers
                 return BadRequest();
             }
             Student student = _mapper.Map<Student>(model);
-            var id = await _studentRepository.Create(student);
-            model.Id = id;
+            var studentAfterCreation = await _studentRepository.Create(student);
+            model.Id = studentAfterCreation.Id;
             return CreatedAtRoute("GetStudentById", new { id = model.Id }, model);
         }
 
@@ -47,7 +47,7 @@ namespace CollegeApp.Controllers
             {
                 return BadRequest();
             }
-            var student = await _studentRepository.GetById(id);
+            var student = await _studentRepository.GetById(student => student.Id == id);
             if (student == null)
             {
                 return NotFound($"The student with id {id} not found");
@@ -67,7 +67,7 @@ namespace CollegeApp.Controllers
             {
                 return BadRequest();
             }
-            var student = await _studentRepository.GetById(id);
+            var student = await _studentRepository.GetById(student => student.Id == id);
             if (student == null)
             {
                 return NotFound($"The student with id {id} not found");
@@ -86,7 +86,7 @@ namespace CollegeApp.Controllers
             {
                 return BadRequest();
             }
-            var student = await _studentRepository.GetByName(name);
+            var student = await _studentRepository.GetByName(student => student.StudentName.ToLower().Contains(name));
             if (student == null)
             {
                 return NotFound($"The student with name {name} not found");
@@ -117,7 +117,7 @@ namespace CollegeApp.Controllers
             {
                 BadRequest();
             }
-            var existingStudent = await _studentRepository.GetById(id, true);
+            var existingStudent = await _studentRepository.GetById(student => student.Id == id, true);
             if (existingStudent == null)
             {
                 return NotFound();
@@ -146,7 +146,7 @@ namespace CollegeApp.Controllers
             {
                 BadRequest();
             }
-            var existingStudent = await _studentRepository.GetById(model.Id, true);
+            var existingStudent = await _studentRepository.GetById(student => student.Id == model.Id, true);
             if (existingStudent == null)
             {
                 return NotFound();
