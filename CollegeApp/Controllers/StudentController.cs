@@ -12,9 +12,9 @@ namespace CollegeApp.Controllers
     public class StudentController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly ICollegeRepository<Student> _studentRepository;
+        private readonly IStudentRepository _studentRepository;
 
-        public StudentController(IMapper mapper, ICollegeRepository<Student> studentRepository)
+        public StudentController(IMapper mapper, IStudentRepository studentRepository)
         {
             _mapper = mapper;
             _studentRepository = studentRepository;

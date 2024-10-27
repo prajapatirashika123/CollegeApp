@@ -14,6 +14,7 @@ namespace CollegeApp.Data.Config
             builder.Property(n => n.StudentName).HasMaxLength(250);
             builder.Property(n => n.StudentName).IsRequired();
             builder.Property(x => x.Id).UseIdentityColumn();
+
             builder.HasData(new List<Student>()
             {
                 new Student {
@@ -31,6 +32,11 @@ namespace CollegeApp.Data.Config
                     StudentName="Iyt",
                 },
             });
+
+            builder.HasOne(n => n.Department)
+                .WithMany(n => n.Students)
+                .HasForeignKey(n => n.DepartmentId)
+                .HasConstraintName("FK_Students_Department");
         }
     }
 }
