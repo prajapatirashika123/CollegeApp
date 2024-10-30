@@ -1,8 +1,11 @@
 using CollegeApp.Configurations;
 using CollegeApp.Data;
 using CollegeApp.Data.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,8 +46,9 @@ builder.Services.AddScoped(typeof(ICollegeRepository<>), typeof(CollegeRepositor
 //    //policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
 //}));
 
-builder.Services.AddCors(options => {
-    options.AddDefaultPolicy( policy =>
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
     {
         policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
@@ -58,12 +62,54 @@ builder.Services.AddCors(options => {
     });
     options.AddPolicy("AllowOnlyGoogle", policy =>
     {
-        policy.WithOrigins("http://google.com","http://gmail.com").AllowAnyHeader().AllowAnyMethod();
+        policy.WithOrigins("http://google.com", "http://gmail.com").AllowAnyHeader().AllowAnyMethod();
     });
     options.AddPolicy("AllowOnlyMicrosoft", policy =>
     {
-        policy.WithOrigins("http://outlook.com","http://microsoft.com").AllowAnyHeader().AllowAnyMethod();
+        policy.WithOrigins("http://outlook.com", "http://microsoft.com").AllowAnyHeader().AllowAnyMethod();
     });
+});
+var keyJWTSecretLocal = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTSecretLocal"));
+var keyJWTSecretMicrosoft = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTSecretMicrosoft"));
+var keyJWTSecretGoogle = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTSecretGoogle"));
+//JWT Authentication Configuration
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer("LoginForGoogleUsers", options =>
+{
+    //options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        IssuerSigningKey = new SymmetricSecurityKey(keyJWTSecretGoogle),
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ValidateIssuerSigningKey = true,
+    };
+}).AddJwtBearer("LoginForMicrosoftUsers", options =>
+{
+    //options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        IssuerSigningKey = new SymmetricSecurityKey(keyJWTSecretMicrosoft),
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ValidateIssuerSigningKey = true,
+    };
+}).AddJwtBearer("LoginForLocalUsers", options =>
+{
+    //options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        IssuerSigningKey = new SymmetricSecurityKey(keyJWTSecretLocal),
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ValidateIssuerSigningKey = true,
+    };
 });
 
 var app = builder.Build();
@@ -79,7 +125,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseCors();
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
@@ -93,7 +139,7 @@ app.UseEndpoints(endpoints =>
              .RequireCors("AllowAll");
 
     endpoints.MapGet("api/testingendpoint2",
-        context => context.Response.WriteAsync("echo2"));
+        context => context.Response.WriteAsync(builder.Configuration.GetValue<string>("JWTSecret")));
 });
 
 app.Run();
