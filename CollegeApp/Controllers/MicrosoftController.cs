@@ -12,6 +12,8 @@ namespace CollegeApp.Controllers
     public class MicrosoftController : ControllerBase
     {
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult Get()
         {
             return Ok("This is microsoft");
